@@ -41,11 +41,6 @@ const PROTOCOL     = Buffer.from("BitTorrent protocol"),
       UT_PEX       = 1,
       UT_METADATA  = 2;
 
-interface Extension {
-  "ut_pex":      number;
-  "ut_metadata": number;
-}
-
 interface Request {
   index:  number;
   begin:  number;
@@ -59,15 +54,17 @@ interface Options {
 interface MetadataHandshake {
   "ipv4":          Buffer;
   "ipv6":          Buffer;
-  "m": {
-     ut_metadata:  number;
-     ut_pex:       number;
-   };
+  "m": Extension;
   "metadata_size": number;
   "p":             number;
   "reqq":          number;
   "v":             Buffer;
   "yourip":        Buffer;
+}
+
+interface Extension {
+  "ut_pex":      number;
+  "ut_metadata": number;
 }
 
 inherits(Wire, Duplex);
@@ -217,16 +214,16 @@ Wire.prototype.sendHandshake = function() {
   this._push(Buffer.concat([PROTOCOL, RESERVED, infoHashBuffer, peerIDbuffer]));
   this._sendMetaHandshake();
 };
-// not interested: <len=0001><id=3>
-Wire.prototype.sendNotInterested = function() {
-  this._debug("sending not interested");
-  this._push(UNINTERESTED);
-};
 // interested: <len=0001><id=2>
 Wire.prototype.sendInterested = function() {
   this._debug("sending interested");
   this._push(Buffer.concat([INTERESTED, UNCHOKE]));
   this.choked = false;
+};
+// not interested: <len=0001><id=3>
+Wire.prototype.sendNotInterested = function() {
+  this._debug("sending not interested");
+  this._push(UNINTERESTED);
 };
 // have: <len=0005><id=4><piece index>
 Wire.prototype.sendHave = function(index: number) {
@@ -314,7 +311,7 @@ Wire.prototype._onCancel = function(index: number, begin: number, length: number
   this.emit("cancel", index, begin, length);
 };
 // port: <len=0003><id=9><listen-port>
-Wire.prototype._onCancel = function(port: number) {
+Wire.prototype._onPort = function(port: number) {
   this.emit("dht_port", port);
 };
 

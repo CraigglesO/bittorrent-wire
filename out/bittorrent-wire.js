@@ -117,14 +117,14 @@ Wire.prototype.sendHandshake = function () {
     this._push(buffer_1.Buffer.concat([PROTOCOL, RESERVED, infoHashBuffer, peerIDbuffer]));
     this._sendMetaHandshake();
 };
-Wire.prototype.sendNotInterested = function () {
-    this._debug("sending not interested");
-    this._push(UNINTERESTED);
-};
 Wire.prototype.sendInterested = function () {
     this._debug("sending interested");
     this._push(buffer_1.Buffer.concat([INTERESTED, UNCHOKE]));
     this.choked = false;
+};
+Wire.prototype.sendNotInterested = function () {
+    this._debug("sending not interested");
+    this._push(UNINTERESTED);
 };
 Wire.prototype.sendHave = function (index) {
     this._debug("send have");
@@ -189,7 +189,7 @@ Wire.prototype._onPiece = function (index, begin, block) {
 Wire.prototype._onCancel = function (index, begin, length) {
     this.emit("cancel", index, begin, length);
 };
-Wire.prototype._onCancel = function (port) {
+Wire.prototype._onPort = function (port) {
     this.emit("dht_port", port);
 };
 Wire.prototype._sendMetaHandshake = function () {
