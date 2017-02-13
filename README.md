@@ -174,7 +174,7 @@ wire.on("request", () => {
 });
 ```
 
-<div style="color: green; font-weight: 400;">Outbound [Cancel]</div>
+![#c5f015](https://placehold.it/15/c5f015/000000?text=+) `Outbound [Cancel]`
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
@@ -183,7 +183,7 @@ wire.sendCancel(0, 16384 * 2, 16384); //Index number
 ```
 
 
-<div style="color: red; font-weight: 400;">Inbound [Cancel]</div>
+![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `Inbound [Cancel]`
 ``` javascript
 wire.on("cancel", (index, begin, length) => {
   // index  -> 0
