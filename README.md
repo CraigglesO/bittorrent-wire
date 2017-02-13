@@ -11,6 +11,8 @@
 
 One of the fastest, lightest, and smartest bittorrent wires yet.
 
+| streams | protocol |
+|---|---|
 | ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.png) | ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/bittorrent-swarm.png)
 
 #### Sources
