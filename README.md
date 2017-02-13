@@ -244,37 +244,66 @@ This will request unchoking the connection
 If the peer does not have data we need
 
 #### Wire.sendHave(index: number) `<len=0005><id=4><piece index>`
-* index: the block in question [e.g. 0, 1, 2, 3, ...]
+* `index` the block in question [e.g. 0, 1, 2, 3, ...]
 * Send peers that you have a new piece in your bitfield
 
 #### Wire.sendBitfield(bitfield: string) `<len=0001+X><id=5><bitfield>`
-* bitfield: string representing a hex bitfield [e.g. "f8"] [binary: 1111 1000]
+* `bitfield` string representing a hex bitfield [e.g. "f8"] [binary: 1111 1000]
 * Send peer your current downloaded bitfield
 
 #### Wire.sendRequest(payload: Buffer, count: number) `<len=0013><id=6><index><begin><length>`
-* payload: wrap the index, begin, and length all into one buffer
-* count: number of pieces you are requesting [e.g. 0, 1, 2, 3, ...]
+* `payload` wrap the index, begin, and length all into one buffer
+* `count` number of pieces you are requesting [e.g. 0, 1, 2, 3, ...]
 * Send a request for either a piece or block. Payload allows for multiple requests
 
 #### Wire.sendPiece(piece: Buffer) `<len=0009+X><id=7><index><begin><block>`
-* piece: wrap the index, begin, and length all into one buffer
+* `piece` wrap the index, begin, and length all into one buffer
 * Given a request, this is how you respond
 
 #### Wire.sendCancel(index: number, begin: number, length: number) `<len=0013><id=8><index><begin><length>`
-* index: index of the block [e.g. 0, 1, 2, 3, ...]
-* begin: number inside the block [e.g. 0 * 16384, 1 * 16384, 2 * 16384, ...]
+* `index` index of the block [e.g. 0, 1, 2, 3, ...]
+* `begin` number inside the block [e.g. 0 * 16384, 1 * 16384, 2 * 16384, ...]
 * length: length (always 16384 unless last piece)
 * Canceling a download with the peer
 
 #### Wire.sendPort(port: number) `<len=0003><id=9><listen-port>`
-* port: number of the UDP port the DHT is listening on
+* `port` number of the UDP port the DHT is listening on
 * send peer your KPRC protocol UDP port
-
-### Wire: Inbound
 
 ### Wire: Extensions
 
+#### Wire.sendMetaHandshake()
+* if *"metadata_handshake"* options are set, this will send your options specified, otherwise the defaults are:
+  * `ut_metadata` 2
+  * `ut_pex` 1
+
 ### Wire: High Level Calls
+
+#### Wire.isChoked(): Boolean
+  * `return this.choked`
+
+#### Wire.isBusy(): Boolean
+  * `return this.busy`
+
+#### Wire.setBusy()
+  * `this.busy = true`
+
+#### Wire.unsetBusy()
+  * `this.busy = false`
+
+#### Wire.closeConnection()
+  * `this.isActive = false`
+  * `this.emit("close")`
+
+#### Wire.removeMeta()
+  * `this.meta = false`
+  * `delete this.ext[ UT_METADATA ]`
+
+#### Wire.removePex()
+  * `delete this.ext[ UT_PEX ]`
+
+## Debug
+`DEBUG="bittorrent-wire" ts-node bittorrent-wire.ts`
 
 ## ISC License (Open Source Initiative)
 

@@ -169,3 +169,21 @@ test("Cancel (3)", function (t) {
   wire.sendCancel(0, 16384 * 2, 16384);
 
 });
+
+test("Port (1)", function (t) {
+  t.plan(1);
+
+  let wire  = new Wire("e940a7a57294e4c98f62514b32611e38181b6cae", id);
+  wire.on("error",  (err) => { t.fail(err.toString()); });
+  wire.pipe(wire);
+
+  wire.on("dht_port", (port) => {
+    t.equal(port, 1337, "Recieved port correctly");
+  });
+
+  wire.sendHandshake();
+  wire.sendInterested();
+
+  wire.sendPort(1337);
+
+});

@@ -203,6 +203,33 @@ Wire.prototype._sendMetaHandshake = function () {
     else
         this.metaDataHandshake();
 };
+Wire.prototype.metaDataHandshake = function (msg) {
+    this._debug("sending meta_handshake");
+    let handshake = (msg) ? msg : EXT_PROTOCOL, prepHandshake = EXTENDED, handshakeEn = bencode.encode(handshake);
+    prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
+    let handshakeBuf = buffer_1.Buffer.concat([prepHandshake, buffer_1.Buffer.from([0x00]), handshakeEn]);
+    this._push(handshakeBuf);
+};
+Wire.prototype.creteExtensions = function (metadataSize, torrentInfo) {
+    this.createUTmetadata(metadataSize, torrentInfo);
+    this.createUTpex();
+};
+Wire.prototype.creteUTmetadata = function (metadataSize, torrentInfo) {
+    this.ext[UT_METADATA] = new UTmetadata(metadataSize, this.infoHash, torrentInfo);
+};
+Wire.prototype.creteUTpex = function () {
+    this.ext[UT_PEX] = new UTpex();
+};
+Wire.prototype.sendPexPeers = function (addPeers, addPeers6, dropPeers, dropPeers6) {
+    if (this.ext["ut_pex"]) {
+        this.ext[UT_PEX].addAll(addPeers, addPeers6, dropPeers, dropPeers6);
+        let prepMsg = EXTENDED, msgEn = this.ext[UT_PEX].prepMessage(), code = new buffer_1.Buffer(1);
+        prepMsg.writeUInt32BE(msgEn.length + 2, 0);
+        code.writeUInt8(this.ext["ut_pex"], 0);
+        let msgBuf = buffer_1.Buffer.concat([prepMsg, code, msgEn]);
+        this._push(msgBuf);
+    }
+};
 Wire.prototype._onExtension = function (extensionID, payload) {
     const self = this;
     if (extensionID === 0) {
@@ -210,9 +237,11 @@ Wire.prototype._onExtension = function (extensionID, payload) {
         let obj = bencode.decode(payload);
         let m = obj.m;
         if (m["ut_metadata"]) {
-            self.ext[UT_METADATA] = new UTmetadata(obj.metadata_size, self.infoHash);
+            if (!self.ext[UT_METADATA])
+                self.ext[UT_METADATA] = new UTmetadata(obj.metadata_size, self.infoHash);
             self.ext["ut_metadata"] = m["ut_metadata"];
             self.ext[UT_METADATA].on("next", (piece) => {
+                self._debug("metadata next piece request");
                 let request = { "msg_type": 0, "piece": piece }, prepRequest = EXTENDED, requestEn = bencode.encode(request), code = new buffer_1.Buffer(1);
                 prepRequest.writeUInt32BE(requestEn.length + 2, 0);
                 code.writeUInt8(self.ext["ut_metadata"], 0);
@@ -220,11 +249,13 @@ Wire.prototype._onExtension = function (extensionID, payload) {
                 this._push(requestBuf);
             });
             self.ext[UT_METADATA].on("metadata", (torrent) => {
+                self._debug("complete metadata package");
                 self.emit("metadata", torrent);
             });
         }
         if (m["ut_pex"]) {
-            self.ext[UT_PEX] = new UTpex();
+            if (!self.ext[UT_PEX])
+                self.ext[UT_PEX] = new UTpex();
             self.ext["ut_pex"] = m["ut_pex"];
             self.ext[UT_PEX].on("pex_added", (peers) => {
                 self.emit("pex_added", peers);
@@ -255,13 +286,6 @@ Wire.prototype.metaDataRequest = function () {
         let requestBuf = buffer_1.Buffer.concat([prepRequest, code, requestEn]);
         this._push(requestBuf);
     }
-};
-Wire.prototype.metaDataHandshake = function (msg) {
-    this._debug("sending meta_handshake");
-    let handshake = (msg) ? msg : EXT_PROTOCOL, prepHandshake = EXTENDED, handshakeEn = bencode.encode(handshake);
-    prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
-    let handshakeBuf = buffer_1.Buffer.concat([prepHandshake, buffer_1.Buffer.from([0x00]), handshakeEn]);
-    this._push(handshakeBuf);
 };
 Wire.prototype.handleCode = function (payload) {
     const self = this;
@@ -315,7 +339,8 @@ Wire.prototype.handleCode = function (payload) {
             break;
         case 9:
             self._debug("Recieved DHT port");
-            self._onPort(payload.readUInt8(1));
+            self._onPort(payload.readUInt16BE(1));
+            break;
         case 20:
             self._debug("Extension Protocol");
             self._onExtension(payload.readUInt8(1), payload.slice(2));

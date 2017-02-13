@@ -1,10 +1,11 @@
 {
   "name": "bittorrent-wire",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "A stream ready wire for the Bittorrent Protocol",
   "main": "./out/bittorrent-wire.js",
   "scripts": {
-    "test": "echo running server tests... && cd test && DEBUG=\"bittorrent-wire\" ts-node ../node_modules/blue-tape/bin/blue-tape \"**/*.ts\" | tap-spec",
+    "test": "echo running server tests... && cd test && ts-node ../node_modules/blue-tape/bin/blue-tape \"**/*.ts\" | tap-spec",
+    "test+debug": "echo running server tests... && cd test && DEBUG=\"bittorrent-wire\" ts-node ../node_modules/blue-tape/bin/blue-tape \"**/*.ts\" | tap-spec",
     "start": "npm run build:live",
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./hose.ts",
     "build": "echo building... && typings bundle -o out/bittorrent-wire.d.ts",

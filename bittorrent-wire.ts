@@ -67,6 +67,12 @@ interface Extension {
   "ut_metadata": number;
 }
 
+interface Info {
+  name:           string;
+  "piece length": number;
+  pieces:         Array<string>;
+}
+
 inherits(Wire, Duplex);
 
 function Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Options) {
@@ -330,39 +336,73 @@ Wire.prototype._sendMetaHandshake = function() {
   else
     this.metaDataHandshake();
 };
+Wire.prototype.metaDataHandshake = function(msg?: MetadataHandshake) {
+  // Prep and send a meta_data handshake:
+  this._debug("sending meta_handshake");
+  let handshake     = (msg) ? msg : EXT_PROTOCOL,
+      prepHandshake = EXTENDED,
+      handshakeEn   = bencode.encode(handshake);
+  prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
+  let handshakeBuf  = Buffer.concat([prepHandshake, Buffer.from([0x00]), handshakeEn]);
+  this._push(handshakeBuf);
+};
+Wire.prototype.creteExtensions = function(metadataSize: number, torrentInfo: Info) {
+  this.createUTmetadata(metadataSize, torrentInfo);
+  this.createUTpex();
+};
+Wire.prototype.creteUTmetadata = function(metadataSize: number, torrentInfo: Info) {
+  this.ext[UT_METADATA] = new UTmetadata(metadataSize, this.infoHash, torrentInfo);
+};
+Wire.prototype.creteUTpex = function() {
+  this.ext[UT_PEX] = new UTpex();
+};
+Wire.prototype.sendPexPeers = function(addPeers: Array<string>, addPeers6: Array<string>, dropPeers: Array<string>, dropPeers6: Array<string>) {
+  if (this.ext["ut_pex"]) {
+    this.ext[UT_PEX].addAll(addPeers, addPeers6, dropPeers, dropPeers6);
+    let prepMsg     = EXTENDED,
+        msgEn       = this.ext[UT_PEX].prepMessage(),
+        code        = new Buffer(1);
+    prepMsg.writeUInt32BE(msgEn.length + 2, 0);
+    code.writeUInt8(this.ext["ut_pex"], 0);
+    let msgBuf = Buffer.concat([prepMsg, code, msgEn]);
+    this._push(msgBuf);
+  }
+};
 // extension: <len=0002+x><id=20><ext_ID><ext_msg>
 Wire.prototype._onExtension = function(extensionID: number, payload: Buffer) {
   const self = this;
   if (extensionID === 0) {
-    // Handle the extension handshake:
     self._debug("extension handshake");
     let obj = bencode.decode(payload);
     let m = obj.m;
     if (m["ut_metadata"]) {
       // Handle the ut_metadata protocol here:
-      self.ext[UT_METADATA]   = new UTmetadata(obj.metadata_size, self.infoHash);
+      if (!self.ext[UT_METADATA])
+        self.ext[UT_METADATA] = new UTmetadata(obj.metadata_size, self.infoHash);
       self.ext["ut_metadata"] = m["ut_metadata"];
 
       // Prep emitter responces:
       self.ext[UT_METADATA].on("next", (piece) => {
+        self._debug("metadata next piece request");
         // Ask the peer for the next piece
-        let request       = { "msg_type": 0, "piece": piece },
-            prepRequest   = EXTENDED,
-            requestEn     = bencode.encode(request),
-            code          = new Buffer(1);
+        let request     = { "msg_type": 0, "piece": piece },
+            prepRequest = EXTENDED,
+            requestEn   = bencode.encode(request),
+            code        = new Buffer(1);
         prepRequest.writeUInt32BE(requestEn.length + 2, 0);
         code.writeUInt8(self.ext["ut_metadata"], 0);
         let requestBuf = Buffer.concat([prepRequest, code, requestEn]);
         this._push(requestBuf);
       });
       self.ext[UT_METADATA].on("metadata", (torrent) => {
-        // send up:
+        self._debug("complete metadata package");
         self.emit("metadata", torrent);
       });
     }
     if (m["ut_pex"]) {
       // Handle the PEX protocol here
-      self.ext[UT_PEX]   = new UTpex();
+      if (!self.ext[UT_PEX])
+        self.ext[UT_PEX] = new UTpex();
       self.ext["ut_pex"] = m["ut_pex"];
 
       // Prep emitter responces:
@@ -386,7 +426,6 @@ Wire.prototype._onExtension = function(extensionID: number, payload: Buffer) {
       self.ext[extensionID]._message(payload);
   }
 };
-
 // All metadata requests:
 Wire.prototype.metaDataRequest = function() {
   const self = this;
@@ -402,17 +441,6 @@ Wire.prototype.metaDataRequest = function() {
     let requestBuf = Buffer.concat([prepRequest, code, requestEn]);
     this._push(requestBuf);
   }
-};
-
-Wire.prototype.metaDataHandshake = function(msg?: MetadataHandshake) {
-  // Prep and send a meta_data handshake:
-  this._debug("sending meta_handshake");
-  let handshake     = (msg) ? msg : EXT_PROTOCOL,
-      prepHandshake = EXTENDED,
-      handshakeEn   = bencode.encode(handshake);
-  prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
-  let handshakeBuf  = Buffer.concat([prepHandshake, Buffer.from([0x00]), handshakeEn]);
-  this._push(handshakeBuf);
 };
 
 /** HANDLE INCOMING MESSAGES HERE: **/
@@ -478,7 +506,8 @@ Wire.prototype.handleCode = function(payload: Buffer) {
     case 9:
       // Port
       self._debug("Recieved DHT port");
-      self._onPort(payload.readUInt8(1));
+      self._onPort(payload.readUInt16BE(1));
+      break;
     case 20:
       self._debug("Extension Protocol");
       self._onExtension(payload.readUInt8(1), payload.slice(2));
