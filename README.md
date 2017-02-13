@@ -75,14 +75,12 @@ socket.once('connect', () => {
 
 ### Function-Event Pair
 
-#### Outbound [Handshake]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Handshake] [#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 wire.sendHandshake();
 ```
 
-#### Inbound [Handshake]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Handshake] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("handshake", function (infoHash: Buffer, peerId: Buffer) {
   // infoHash -> 20 bit hex buffer
@@ -90,69 +88,60 @@ wire.on("handshake", function (infoHash: Buffer, peerId: Buffer) {
 });
 ```
 
-#### Outbound [Not Interested]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Not Interested] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 wire.sendHandshake();
 wire.sendNotInterested();
 ```
 
-#### Inbound [Not Interested]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Not Interested] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("close", () => {
   // wire.isActive -> false
 });
 ```
 
-#### Outbound [Interested]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Interested] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
 ```
 
-#### Inbound [Interested]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Interested] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("interested", () => {
   // wire.choked -> false
 });
 ```
 
-#### Outbound [Have]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Have] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 wire.sendHandshake();
 wire.sendHave(1); //Index number
 ```
 
-#### Inbound [Have]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Have] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("have", (index: number) => {
   // index -> 1
 });
 ```
 
-#### Outbound [Bitfield]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Bitfield] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 let buffer = Buffer.from("40", "hex");
 wire.sendHandshake();
 wire.sendBitfield(buffer); // Hex Buffer
 ```
 
-#### Inbound [Bitfield]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Bitfield] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("bitfield", (bits) => {
   // bits.toString("hex") -> 40
 });
 ```
 
-#### Outbound [Request]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Request] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 const TPH = require("torrent-piece-handler");
 const files = [ { path: "Downloads/lol1/1.png",
@@ -176,8 +165,7 @@ tph.prepareRequest(0, (buf, count) => {
 });
 ```
 
-#### Inbound [Request]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Request] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("request", () => {
   // wire.inRequests[2].index  -> 0
@@ -186,8 +174,7 @@ wire.on("request", () => {
 });
 ```
 
-#### Outbound [Cancel]
-![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
+#### Outbound [Cancel] ![#1589F0](https://placehold.it/15/1589F0/000000?text=+)
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
@@ -196,8 +183,7 @@ wire.sendCancel(0, 16384 * 2, 16384); //Index number
 ```
 
 
-#### Inbound [Cancel]
-![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
+#### Inbound [Cancel] ![#c5f015](https://placehold.it/15/c5f015/000000?text=+)
 ``` javascript
 wire.on("cancel", (index, begin, length) => {
   // index  -> 0
@@ -240,6 +226,8 @@ interface Extension {
 }
 ```
 
+### Wire: Outbound
+
 #### Wire.sendHandshake() `<pstrlen><pstr><reserved><info_hash><peer_id>`
 The first step in starting a channel with another peer
 
@@ -271,6 +259,16 @@ If the peer does not have data we need
 * begin: number inside the block [e.g. 0 * 16384, 1 * 16384, 2 * 16384, ...]
 * length: length (always 16384 unless last piece)
 * Canceling a download with the peer
+
+#### Wire.sendPort(port: number) `<len=0003><id=9><listen-port>`
+* port: number of the UDP port the DHT is listening on
+* send peer your KPRC protocol UDP port
+
+### Wire: Inbound
+
+### Wire: Extensions
+
+### Wire: High Level Calls
 
 ## ISC License (Open Source Initiative)
 

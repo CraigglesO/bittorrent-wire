@@ -266,6 +266,12 @@ Wire.prototype.sendCancel = function(index: number, begin: number, length: numbe
   buf.writeUInt32BE(length, 8);
   this._push( Buffer.concat([CANCEL, buf]) );
 };
+// port: <len=0003><id=9><listen-port>
+Wire.prototype.sendPort = function(port: number) {
+  let buf = new Buffer(2);
+  buf.writeUInt16BE(port, 0);
+  this._push( Buffer.concat([PORT, buf]) );
+};
 
 /** ALL INCOMING GOES HERE: **/
 

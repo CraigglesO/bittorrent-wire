@@ -159,6 +159,11 @@ Wire.prototype.sendCancel = function (index, begin, length) {
     buf.writeUInt32BE(length, 8);
     this._push(buffer_1.Buffer.concat([CANCEL, buf]));
 };
+Wire.prototype.sendPort = function (port) {
+    let buf = new buffer_1.Buffer(2);
+    buf.writeUInt16BE(port, 0);
+    this._push(buffer_1.Buffer.concat([PORT, buf]));
+};
 Wire.prototype._nextAction = function (length, action) {
     this.parseSize = length;
     this.actionStore = action;
