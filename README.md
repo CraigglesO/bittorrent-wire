@@ -11,6 +11,8 @@
 
 One of the fastest, lightest, and smartest bittorrent wires yet.
 
+| ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.png) | ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/bittorrent-swarm.png)
+
 #### Sources
   * [WIKIPEDIA](https://wiki.theory.org/BitTorrentSpecification#Handshake)
   * [BEP_0003](http://www.bittorrent.org/beps/bep_0003.html)
@@ -18,8 +20,6 @@ One of the fastest, lightest, and smartest bittorrent wires yet.
 #### Streams
 * [THE STREAM HANDBOOK](https://github.com/substack/stream-handbook)
 * [Duplex Streams](https://nodejs.org/api/stream.html#stream_duplex_and_transform_streams)
-
-![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.png)
 
 
 #### Extension Protocol
@@ -199,12 +199,12 @@ wire.on("cancel", (index, begin, length) => {
 ``` javascript
 new Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Options)
 ```
-* infoHash: the torrent info_hash
+* **infoHash**: the torrent info_hash
   * 20 byte hex Buffer or 20 character string
-  * ex: "e940a7a57294e4c98f62514b32611e38181b6cae"
-* myID: the ID of the user.
+  * ex: `"e940a7a57294e4c98f62514b32611e38181b6cae"`
+* **myID**: the ID of the user.
   * 20 byte hex Buffer or 20 character string
-  * ex: "-EM0022-PEANUTS4AITH"
+  * ex: `"-EM0022-PEANUTS4AITH"`
 * Options:
 ``` javascript
 interface Options {
