@@ -1,11 +1,11 @@
 # bittorrent-wire [![travis][travis-image]][travis-url] [![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url]
 
-[travis-image]: https://travis-ci.org/CraigglesO/hose.svg?branch=master
-[travis-url]: https://travis-ci.org/CraigglesO/hose
-[npm-image]: https://img.shields.io/npm/v/hose.svg
-[npm-url]: https://npmjs.org/package/hose
-[downloads-image]: https://img.shields.io/npm/dm/hose.svg
-[downloads-url]: https://npmjs.org/package/hose
+[travis-image]: https://travis-ci.org/CraigglesO/bittorrent-wire.svg?branch=master
+[travis-url]: https://travis-ci.org/CraigglesO/bittorrent-wire
+[npm-image]: https://img.shields.io/npm/v/bittorrent-wire.svg
+[npm-url]: https://npmjs.org/package/bittorrent-wire
+[downloads-image]: https://img.shields.io/npm/dm/bittorrent-wire.svg
+[downloads-url]: https://npmjs.org/package/bittorrent-wire
 
 ### A stream ready wire for the Bittorrent Protocol
 
