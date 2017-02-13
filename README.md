@@ -19,7 +19,7 @@ One of the fastest, lightest, and smartest bittorrent wires yet.
 * [THE STREAM HANDBOOK](https://github.com/substack/stream-handbook)
 * [Duplex Streams](https://nodejs.org/api/stream.html#stream_duplex_and_transform_streams)
 
-<object data="https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.svg" type="image/svg+xml"></object>
+![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.png)
 
 
 #### Extension Protocol
@@ -244,7 +244,7 @@ If the peer does not have data we need
 * Send peers that you have a new piece in your bitfield
 
 #### Wire.sendBitfield(bitfield: string) `<len=0001+X><id=5><bitfield>`
-* bitfield: string representing a hex bitfield [e.g. "f8"] (binary: 1111 1000)
+* bitfield: string representing a hex bitfield [e.g. "f8"] [binary: 1111 1000]
 * Send peer your current downloaded bitfield
 
 #### Wire.sendRequest(payload: Buffer, count: number) `<len=0013><id=6><index><begin><length>`
