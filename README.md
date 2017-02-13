@@ -277,6 +277,22 @@ If the peer does not have data we need
   * `ut_metadata` 2
   * `ut_pex` 1
 
+#### Wire.creteExtensions(metadataSize: number, torrentInfo: Info)
+  * `this.createUTmetadata(metadataSize, torrentInfo)`
+  * `this.createUTpex()`
+
+#### Wire.creteUTmetadata(metadataSize: number, torrentInfo: Info)
+  * `this.ext[UT_METADATA] = new UTmetadata(metadataSize, this.infoHash, torrentInfo)`
+
+#### Wire.prototype.creteUTpex()
+  * `this.ext[UT_PEX] = new UTpex()`
+
+#### Wire.prototype.sendPexPeers (addPeers: Array<string>, addPeers6: Array<string>, dropPeers: Array<string>, dropPeers6: Array<string>)
+  * `addPeers` ipv4 peers that you know are good
+  * `addPeers6` ipv6 peers that you know are good
+  * `dropPeers` ipv4 peers that you know are bad
+  * `dropPeers6` ipv6 peers that you know are bad
+
 ### Wire: High Level Calls
 
 #### Wire.isChoked(): Boolean
