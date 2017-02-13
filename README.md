@@ -174,7 +174,7 @@ wire.on("request", () => {
 });
 ```
 
-#### <span style="color:orange;">Outbound</span> [Cancel]
+<span style="font-weigth: bold; color:orange;">Outbound</span> [Cancel]
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
@@ -195,7 +195,9 @@ wire.on("cancel", (index, begin, length) => {
 
 ### Class: Wire
 
-#### new Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Options)
+``` javascript
+new Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Options)
+```
 * infoHash: the torrent info_hash
   * 20 byte hex Buffer or 20 character string
 * myID: the ID of the user.
