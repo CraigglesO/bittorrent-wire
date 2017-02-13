@@ -201,8 +201,10 @@ new Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Options)
 ```
 * infoHash: the torrent info_hash
   * 20 byte hex Buffer or 20 character string
+  * ex: "e940a7a57294e4c98f62514b32611e38181b6cae"
 * myID: the ID of the user.
   * 20 byte hex Buffer or 20 character string
+  * ex: "-EM0022-PEANUTS4AITH"
 * Options:
 ``` javascript
 interface Options {
