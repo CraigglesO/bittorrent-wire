@@ -19,8 +19,7 @@ One of the fastest, lightest, and smartest bittorrent wires yet.
 * [THE STREAM HANDBOOK](https://github.com/substack/stream-handbook)
 * [Duplex Streams](https://nodejs.org/api/stream.html#stream_duplex_and_transform_streams)
 
-![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.svg)
-<img src="https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.svg">
+<object data="https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.svg" type="image/svg+xml"></object>
 
 
 #### Extension Protocol
@@ -175,7 +174,7 @@ wire.on("request", () => {
 });
 ```
 
-#### Outbound [Cancel]
+#### <span style="color:orange;">Outbound</span> [Cancel]
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
@@ -202,7 +201,8 @@ wire.on("cancel", (index, begin, length) => {
 * myID: the ID of the user.
   * 20 byte hex Buffer or 20 character string
 * Options:
-  * ``` interface Options {
+``` javascript
+interface Options {
   "metadata_handshake": MetadataHandshake;
 }
 
@@ -220,35 +220,36 @@ interface MetadataHandshake {
 interface Extension {
   "ut_pex":      number;
   "ut_metadata": number;
-} ```
+}
+```
 
-#### Wire.sendHandshake() - <pstrlen><pstr><reserved><info_hash><peer_id>
+#### Wire.sendHandshake() `<pstrlen><pstr><reserved><info_hash><peer_id>`
 The first step in starting a channel with another peer
 
-#### Wire.sendInterested() - <len=0001><id=2>
+#### Wire.sendInterested() `<len=0001><id=2>`
 This will request unchoking the connection
 
-#### Wire.sendNotInterested() - <len=0001><id=3>
+#### Wire.sendNotInterested() `<len=0001><id=3>`
 If the peer does not have data we need
 
-#### Wire.sendHave(index: number) - <len=0005><id=4><piece index>
+#### Wire.sendHave(index: number) `<len=0005><id=4><piece index>`
 * index: the block in question [e.g. 0, 1, 2, 3, ...]
 * Send peers that you have a new piece in your bitfield
 
-#### Wire.sendBitfield(bitfield: string) - <len=0001+X><id=5><bitfield>
+#### Wire.sendBitfield(bitfield: string) `<len=0001+X><id=5><bitfield>`
 * bitfield: string representing a hex bitfield [e.g. "f8"] (binary: 1111 1000)
 * Send peer your current downloaded bitfield
 
-#### Wire.sendRequest(payload: Buffer, count: number) - <len=0013><id=6><index><begin><length>
+#### Wire.sendRequest(payload: Buffer, count: number) `<len=0013><id=6><index><begin><length>`
 * payload: wrap the index, begin, and length all into one buffer
 * count: number of pieces you are requesting [e.g. 0, 1, 2, 3, ...]
 * Send a request for either a piece or block. Payload allows for multiple requests
 
-#### Wire.sendPiece(piece: Buffer) - <len=0009+X><id=7><index><begin><block>
+#### Wire.sendPiece(piece: Buffer) `<len=0009+X><id=7><index><begin><block>`
 * piece: wrap the index, begin, and length all into one buffer
 * Given a request, this is how you respond
 
-#### Wire.sendCancel(index: number, begin: number, length: number) - <len=0013><id=8><index><begin><length>
+#### Wire.sendCancel(index: number, begin: number, length: number) `<len=0013><id=8><index><begin><length>`
 * index: index of the block [e.g. 0, 1, 2, 3, ...]
 * begin: number inside the block [e.g. 0 * 16384, 1 * 16384, 2 * 16384, ...]
 * length: length (always 16384 unless last piece)
