@@ -15,7 +15,7 @@ One of the fastest, lightest, and smartest bittorrent wires yet.
 |---|---|
 | ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/stream-duplex.png) | ![stream-duplex](https://github.com/CraigglesO/bittorrent-wire/blob/master/bittorrent-swarm.png)
 
-#### Sources
+#### Bittorrent Protocol
   * [WIKIPEDIA](https://wiki.theory.org/BitTorrentSpecification#Handshake)
   * [BEP_0003](http://www.bittorrent.org/beps/bep_0003.html)
 
@@ -67,7 +67,7 @@ import Wire     from "bittorrent-wire"
 let socket = net.connect(1337, 'localhost');
 
 socket.once('connect', () => {
-  let wire = new Wire("INFO_HASH_GOES_HERE", "PEER_ID_GOES_HERE");
+  let wire = new Wire("e940a7a57294e4c98f62514b32611e38181b6cae", "-EM0022-PEANUTS4AITH");
   socket.pipe(wire).pipe(socket);
 
   wire.on("handshake", (infoHash, peerID) => {

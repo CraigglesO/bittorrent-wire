@@ -2,7 +2,7 @@
   "name": "bittorrent-wire",
   "main": "bittorrent-wire.d.ts",
   "homepage": "",
-  "version": "0.8.0",
+  "version": "0.8.4",
   "globalDevDependencies": {
     "node": "registry:env/node#6.0.0+20170119204930"
   },
