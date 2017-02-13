@@ -21,7 +21,7 @@
   "author": "CraigglesO",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CraigglesO/hose.git"
+    "url": "https://github.com/CraigglesO/bittorrent-wire.git"
   },
   "license": "ISC",
   "devDependencies": {
