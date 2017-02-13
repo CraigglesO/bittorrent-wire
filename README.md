@@ -174,7 +174,9 @@ wire.on("request", () => {
 });
 ```
 
-<span style="font-weigth: bold; color:orange;">Outbound</span> [Cancel]
+```diff
++ Outbound [Cancel]
+```
 ``` javascript
 wire.sendHandshake();
 wire.sendInterested();
@@ -182,7 +184,9 @@ wire.sendInterested();
 wire.sendCancel(0, 16384 * 2, 16384); //Index number
 ```
 
-#### Inbound [Cancel]
+```diff
+- Inbound [Cancel]
+```
 ``` javascript
 wire.on("cancel", (index, begin, length) => {
   // index  -> 0
