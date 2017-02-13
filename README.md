@@ -25,9 +25,11 @@ One of the fastest, lightest, and smartest bittorrent wires yet.
 
 
 #### Extension Protocol
-* Extension      [BEP_0010](http://www.bittorrent.org/beps/bep_0010.html)
-  * UT_PEX       [BEP_0011](http://www.bittorrent.org/beps/bep_0011.html)
-  * UT_METADATA  [BEP_0009](http://www.bittorrent.org/beps/bep_0009.html)
+| Topic | Source |
+|---|---|
+| Extension | [BEP_0010](http://www.bittorrent.org/beps/bep_0010.html) |
+| UT_PEX | [BEP_0011](http://www.bittorrent.org/beps/bep_0011.html) |
+| UT_METADATA | [BEP_0009](http://www.bittorrent.org/beps/bep_0009.html) |
 
 | module | tests | version | description |
 |---|---|---|---|
