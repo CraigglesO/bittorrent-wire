@@ -189,6 +189,9 @@ Wire.prototype._onPiece = function (index, begin, block) {
 Wire.prototype._onCancel = function (index, begin, length) {
     this.emit("cancel", index, begin, length);
 };
+Wire.prototype._onCancel = function (port) {
+    this.emit("dht_port", port);
+};
 Wire.prototype._sendMetaHandshake = function () {
     if (this.metaHandshake && this.peerHasExt)
         this.metaDataHandshake(this.metaHandshake);
@@ -305,6 +308,9 @@ Wire.prototype.handleCode = function (payload) {
             self._debug("Recieved cancel");
             self._onCancel(payload.readUInt32BE(1), payload.readUInt32BE(5), payload.readUInt32BE(9));
             break;
+        case 9:
+            self._debug("Recieved DHT port");
+            self._onPort(payload.readUInt8(1));
         case 20:
             self._debug("Extension Protocol");
             self._onExtension(payload.readUInt8(1), payload.slice(2));

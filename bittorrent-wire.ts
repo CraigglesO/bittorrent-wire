@@ -277,7 +277,7 @@ Wire.prototype._nextAction = function(length: number, action: Function) {
   this.actionStore = action;
 };
 // have: <len=0005><id=4><piece index>
-Wire.prototype._onHave = function(pieceIndex) {
+Wire.prototype._onHave = function(pieceIndex: number) {
   this.emit("have", pieceIndex);
 };
 // bitfield: <len=0001+X><id=5><bitfield>
@@ -286,7 +286,7 @@ Wire.prototype._onBitfield = function(payload) {
   this.emit("bitfield", payload);
 };
 // request: <len=0013><id=6><index><begin><length>
-Wire.prototype._onRequest = function(index, begin, length) {
+Wire.prototype._onRequest = function(index: number, begin: number, length: number) {
   // Add the request to the stack:
   this.inRequests.push({index, begin, length});
   this.emit("request");
@@ -310,8 +310,12 @@ Wire.prototype._onPiece = function(index: number, begin: number, block: Buffer) 
   });
 };
 // cancel: <len=0013><id=8><index><begin><length>
-Wire.prototype._onCancel = function(index, begin, length) {
+Wire.prototype._onCancel = function(index: number, begin: number, length: number) {
   this.emit("cancel", index, begin, length);
+};
+// port: <len=0003><id=9><listen-port>
+Wire.prototype._onCancel = function(port: number) {
+  this.emit("dht_port", port);
 };
 
 /** ALL EXTENSIONS GO HERE **/
@@ -397,7 +401,7 @@ Wire.prototype.metaDataRequest = function() {
   }
 };
 
-Wire.prototype.metaDataHandshake = function(msg?) {
+Wire.prototype.metaDataHandshake = function(msg?: MetadataHandshake) {
   // Prep and send a meta_data handshake:
   this._debug("sending meta_handshake");
   let handshake     = (msg) ? msg : EXT_PROTOCOL,
@@ -468,6 +472,10 @@ Wire.prototype.handleCode = function(payload: Buffer) {
       self._debug("Recieved cancel");
       self._onCancel(payload.readUInt32BE(1), payload.readUInt32BE(5), payload.readUInt32BE(9));
       break;
+    case 9:
+      // Port
+      self._debug("Recieved DHT port");
+      self._onPort(payload.readUInt8(1));
     case 20:
       self._debug("Extension Protocol");
       self._onExtension(payload.readUInt8(1), payload.slice(2));

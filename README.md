@@ -9,19 +9,64 @@
 
 ### A stream ready wire for the Bittorrent Protocol
 
-INFORMATION_GOES_HERE
+One of the fastest, lightest, and smartest bittorrent wires yet.
+
+#### Streams
+* [THE STREAM HANDBOOK](https://github.com/substack/stream-handbook)
+* [Duplex Streams](https://nodejs.org/api/stream.html#stream_duplex_and_transform_streams)
+
+![Alt text](http://github.com/CraigglesO/bittorrent-wire)
+<img src="http://github.com/CraigglesO/bittorrent-wire">
+
+
+#### Extension Protocol
+* Extension      [BEP_0010](http://www.bittorrent.org/beps/bep_0010.html)
+  * UT_PEX       [BEP_0011](http://www.bittorrent.org/beps/bep_0011.html)
+  * UT_METADATA  [BEP_0009](http://www.bittorrent.org/beps/bep_0009.html)
+
+| module | tests | version | description |
+|---|---|---|---|
+| [ut-extensions][ut-extensions] | [![][ut-extensions-ti]][ut-extensions-tu] | [![][ut-extensions-ni]][ut-extensions-nu] | Extensions for The Bittorent Protocol
+
+[ut-extensions]:    https://github.com/CraigglesO/ut-extensions
+[ut-extensions-ti]: https://travis-ci.org/CraigglesO/ut-extensions.svg?branch=master
+[ut-extensions-tu]: https://travis-ci.org/CraigglesO/ut-extensions
+[ut-extensions-ni]: https://img.shields.io/npm/v/ut-extensions.svg
+[ut-extensions-nu]: https://npmjs.org/package/ut-extensions
+
 
 ## Install
 
-``` typescript
+``` javascript
 npm install bittorrent-wire
 ```
 
 ## Usage
-``` typescript
+
+**Basic**
+``` javascript
 import Wire from "bittorrent-wire"
 
-EXAMPLE_USAGE_GOES_HERE
+let wire = new Wire("INFO_HASH_GOES_HERE", "PEER_ID_GOES_HERE");
+
+wire.pipe(wire);
+```
+
+**Online**
+``` javascript
+import * as net from 'net';
+import Wire     from "bittorrent-wire"
+
+let socket = net.connect(1337, 'localhost');
+
+socket.once('connect', () => {
+  let wire = new Wire("INFO_HASH_GOES_HERE", "PEER_ID_GOES_HERE");
+  socket.pipe(wire).pipe(socket);
+
+  wire.on("handshake", (infoHash, peerID) => {
+    // ...
+  });
+});
 
 ```
 
