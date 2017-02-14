@@ -46,6 +46,6 @@
     "bencode": "^0.11.0",
     "speedometer": "^1.0.0",
     "string2compact": "^1.2.2",
-    "ut-extensions": "^1.7.2"
+    "ut-extensions": "^1.7.5"
   }
 }
