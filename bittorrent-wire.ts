@@ -79,7 +79,7 @@ function Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Option
     Duplex.call(this);
     const self = this;
 
-    self._debugId       = ~~((Math.random() * 100000) + 1);
+    self._debugId        = ~~((Math.random() * 100000) + 1);
     self._debug("Begin debugging");
 
     self.destroyed       = false;
@@ -104,6 +104,7 @@ function Wire(infoHash: string | Buffer, myID: string | Buffer, options?: Option
     self.busy            = false;
     self.reqBusy         = false;
     self.meta            = true;
+    self.metaHandshook   = false;
     self.ext             = {};
     self.metaHandshake   = null;
 
@@ -338,25 +339,31 @@ Wire.prototype._sendMetaHandshake = function() {
 };
 Wire.prototype.metaDataHandshake = function(msg?: MetadataHandshake) {
   // Prep and send a meta_data handshake:
-  this._debug("sending meta_handshake");
-  let handshake     = (msg) ? msg : EXT_PROTOCOL,
-      prepHandshake = EXTENDED,
-      handshakeEn   = bencode.encode(handshake);
-  prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
-  let handshakeBuf  = Buffer.concat([prepHandshake, Buffer.from([0x00]), handshakeEn]);
-  this._push(handshakeBuf);
+  if (!this.metaHandshook) {
+    this.metaHandshook = true;
+    this._debug("sending meta_handshake");
+    let handshake     = (msg) ? msg : EXT_PROTOCOL,
+        prepHandshake = EXTENDED,
+        handshakeEn   = bencode.encode(handshake);
+    prepHandshake.writeUInt32BE(handshakeEn.length + 2, 0);
+    let handshakeBuf  = Buffer.concat([prepHandshake, Buffer.from([0x00]), handshakeEn]);
+    this._push(handshakeBuf);
+  }
 };
-Wire.prototype.creteExtensions = function(metadataSize: number, torrentInfo: Info) {
+Wire.prototype.createExtensions = function(metadataSize: number, torrentInfo: Info, myID?: string) {
   this.createUTmetadata(metadataSize, torrentInfo);
-  this.createUTpex();
+  this.createUTpex(myID);
 };
-Wire.prototype.creteUTmetadata = function(metadataSize: number, torrentInfo: Info) {
+Wire.prototype.createUTmetadata = function(metadataSize: number, torrentInfo: Info) {
   this.ext[UT_METADATA] = new UTmetadata(metadataSize, this.infoHash, torrentInfo);
 };
-Wire.prototype.creteUTpex = function() {
+Wire.prototype.createUTpex = function(myID?: string) {
   this.ext[UT_PEX] = new UTpex();
+  if (myID)
+    this.ext[UT_PEX].myID(myID);
 };
 Wire.prototype.sendPexPeers = function(addPeers: Array<string>, addPeers6: Array<string>, dropPeers: Array<string>, dropPeers6: Array<string>) {
+  this._debug("send UT_PEX Peers");
   if (this.ext["ut_pex"]) {
     this.ext[UT_PEX].addAll(addPeers, addPeers6, dropPeers, dropPeers6);
     let prepMsg     = EXTENDED,
@@ -382,6 +389,15 @@ Wire.prototype._onExtension = function(extensionID: number, payload: Buffer) {
       self.ext["ut_metadata"] = m["ut_metadata"];
 
       // Prep emitter responces:
+      self.ext[UT_METADATA].on("meta_r", (buf: Buffer) => {
+        self._debug("metadata send responce");
+        let prepResponce = EXTENDED,
+            code         = new Buffer(1);
+        prepResponce.writeUInt32BE(buf.length + 2, 0);
+        code.writeUInt8(self.ext["ut_metadata"], 0);
+        let responceBuf  = Buffer.concat([prepResponce, code, buf]);
+        this._push(responceBuf);
+      });
       self.ext[UT_METADATA].on("next", (piece) => {
         self._debug("metadata next piece request");
         // Ask the peer for the next piece
@@ -428,6 +444,7 @@ Wire.prototype._onExtension = function(extensionID: number, payload: Buffer) {
 };
 // All metadata requests:
 Wire.prototype.metaDataRequest = function() {
+  this._debug("sending meta request");
   const self = this;
   if (self.ext["ut_metadata"]) {
     self.metaDataHandshake();
