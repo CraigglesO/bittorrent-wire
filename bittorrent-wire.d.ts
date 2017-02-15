@@ -1,3 +1,3 @@
 import Wire = require("./bittorrent-wire");
 
-export = Wire;
+export default Wire;
