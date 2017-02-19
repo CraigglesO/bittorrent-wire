@@ -3,5 +3,5 @@
 declare module 'bittorrent-wire' {
 import Wire = require('~bittorrent-wire/bittorrent-wire');
 
-export = Wire;
+export default Wire;
 }
