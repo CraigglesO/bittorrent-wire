@@ -1,6 +1,4 @@
-# bittorrent-wire [![travis][travis-image]][travis-url] [![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url]
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/CraigglesO/bittorrent-wire.svg)](https://greenkeeper.io/)
+# bittorrent-wire [![travis][travis-image]][travis-url] [![npm][npm-image]][npm-url] [![downloads][downloads-image]][downloads-url] [![Greenkeeper badge](https://badges.greenkeeper.io/CraigglesO/bittorrent-wire.svg)](https://greenkeeper.io/)
 
 [travis-image]: https://travis-ci.org/CraigglesO/bittorrent-wire.svg?branch=master
 [travis-url]: https://travis-ci.org/CraigglesO/bittorrent-wire

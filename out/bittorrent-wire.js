@@ -12,6 +12,7 @@ function Wire(infoHash, myID, options) {
     const self = this;
     self._debugId = ~~((Math.random() * 100000) + 1);
     self._debug("Begin debugging");
+    self.isActive = true;
     self.destroyed = false;
     self.uploadSpeed = speedometer();
     self.downloadSpeed = speedometer();
@@ -82,6 +83,8 @@ Wire.prototype.nextAction = function () {
 Wire.prototype._read = function () { };
 Wire.prototype._write = function (payload, encoding, next) {
     const self = this;
+    if (!self.isActive)
+        return;
     self._debug(`incoming size:`, payload.length);
     self.downloadSpeed(payload.length);
     self.bufferSize += payload.length;
@@ -380,15 +383,15 @@ Wire.prototype.unsetBusy = function () {
 Wire.prototype.closeConnection = function () {
     this._debug("CLOSE CONNECTION");
     this.isActive = false;
+    this.removeMeta();
+    this.removePex();
     this.emit("close");
 };
 Wire.prototype.removeMeta = function () {
     this.meta = false;
-    this.ext[UT_METADATA] = null;
     delete this.ext[UT_METADATA];
 };
 Wire.prototype.removePex = function () {
-    this.ext[UT_PEX] = null;
     delete this.ext[UT_PEX];
 };
 Wire.prototype._debug = function (...args) {
