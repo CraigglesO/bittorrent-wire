@@ -1,6 +1,6 @@
 {
   "name": "bittorrent-wire",
-  "version": "0.9.1",
+  "version": "0.9.3",
   "description": "A stream ready wire for the Bittorrent Protocol",
   "main": "./out/bittorrent-wire.js",
   "scripts": {
